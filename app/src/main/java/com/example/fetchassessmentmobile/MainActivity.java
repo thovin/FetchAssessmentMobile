@@ -44,38 +44,36 @@ public class MainActivity extends AppCompatActivity {
 
         JSONArray jsonArray = GETJSON(SOURCEURL);
         HashMap<Integer, ArrayList<String>> listIdGroups = parseJSON(jsonArray);
-        ArrayList<String> allListIds = new ArrayList<>();
 
 
         Spinner dropdown = binding.listIdSpinner;
-        StringBuilder listOptions = new StringBuilder("All");
-        int i = 1;
+        StringBuilder sb = new StringBuilder("All");
         for (Integer key : listIdGroups.keySet()) {
-            allListIds.addAll(listIdGroups.get(key));
             listIdGroups.get(key).sort(new listIdComparator());
-            listOptions.append(" " + Integer.toString(key));
+            sb.append(" " + Integer.toString(key));
         }
-        allListIds.sort(new listIdComparator());
-        String[] listIds = listOptions.toString().split(" ");
+        String[] listIds = sb.toString().split(" ");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
         dropdown.setAdapter(adapter);
 
+        ArrayList<String> outputStrings = new ArrayList<>();
+        outputStrings.add("");  //This will become all once individuals are populated
+
+        for (int i = 1; i < listIds.length; i++) {
+            sb = new StringBuilder();
+            for (String name : listIdGroups.get(Integer.parseInt(listIds[i]))) {
+                sb.append(name).append("\t");
+            }
+
+            outputStrings.add(sb.toString());
+            outputStrings.set(0, new StringBuilder(outputStrings.get(0)).append("\nlistId: ").append(listIds[i])
+                    .append("\n").append(sb.toString()).toString());
+        }
+
         dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            StringBuilder sb = new StringBuilder();
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                if (position == 0) {   //All
-                    for (String name : allListIds) {
-                        sb.append(name).append("\t");
-                    }
-                } else {    //listId
-                    for (String name : listIdGroups.get(Integer.parseInt(listIds[position]))) {
-                        sb.append(name).append("\t");
-                    }
-                }
-
-                binding.output.setText(sb.toString());
-                sb = new StringBuilder();
+                binding.output.setText(outputStrings.get(position));
             }
 
             @Override
