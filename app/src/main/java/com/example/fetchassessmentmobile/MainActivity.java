@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private String SOURCEURL = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
     private String JSONString = null;
     private ActivityMainBinding binding;
-    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +38,15 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
-        //setContentView(R.layout.activity_main);
 
         JSONArray jsonArray = GETJSON(SOURCEURL);
         HashMap<Integer, ArrayList<String>> listIdGroups = parseJSON(jsonArray);
 
-
         Spinner dropdown = binding.listIdSpinner;
         StringBuilder sb = new StringBuilder("All");
         for (Integer key : listIdGroups.keySet()) {
-            listIdGroups.get(key).sort(new listIdComparator());
             sb.append(" " + Integer.toString(key));
+            listIdGroups.get(key).sort(new listIdComparator());
         }
         String[] listIds = sb.toString().split(" ");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
@@ -80,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
 
     }
 
@@ -115,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            throw new RuntimeException(e); //TODO throw exception or return empty and let unit test deal w/?
+            throw new RuntimeException(e);
         }
 
         return output;
@@ -128,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             return new JSONArray(JSONString);
         } catch (JSONException e) {
-            throw new RuntimeException(e); //TODO throw exception or return empty and let unit test deal w/?
+            throw new RuntimeException(e);
         }
     }
 
@@ -152,8 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 if (inStream == null) { return null; }
 
                 reader = new BufferedReader(new InputStreamReader(inStream));
-                String line;
 
+                String line;
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line + "\n");
                 }
