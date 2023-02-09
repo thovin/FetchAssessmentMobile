@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     private JSONArray GETJSON(String url) {
         new GETJSONStringTask().execute(url);
-//        new JSONTaskNOTINUSE().execute(url);
-//        new JSONTask().execute();
         while (JSONString == null) {
 
         }
@@ -82,12 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
     //TODO make URL input type, JSONArray output?
     class GETJSONStringTask extends AsyncTask<String, Void, String> {
-
-        //TODO treash
-        protected void onPreExecute() {
-            int trash;
-        }
-
 
         protected String doInBackground(String... params) {
             HttpURLConnection conn = null;
@@ -114,14 +106,13 @@ public class MainActivity extends AppCompatActivity {
                     return null;
                 }
 
-                return buffer.toString();
-
+                JSONString = buffer.toString();
+                return null;
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             } finally {
                 if (conn != null) { conn.disconnect(); }
-
                 if (reader != null) {
                     try {
                         reader.close();
@@ -130,11 +121,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }
-
-
-        protected void onPostExecute(String response) {
-            JSONString = response;
         }
 
 
