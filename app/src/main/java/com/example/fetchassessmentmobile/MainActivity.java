@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -22,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,15 +48,41 @@ public class MainActivity extends AppCompatActivity {
         Spinner dropdown = binding.listIdSpinner;
         StringBuilder listOptions = new StringBuilder("All");
         int i = 1;
-        for (Integer key : listIdGroups.keySet()) {//TODO will this work?
+        for (Integer key : listIdGroups.keySet()) {
+            Collections.sort(listIdGroups.get(key));    //TODO make cust comp to sort numerically
             listOptions.append(" " + Integer.toString(key));
         }
         String[] listIds = listOptions.toString().split(" ");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
         dropdown.setAdapter(adapter);
 
+        dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            StringBuilder sb = new StringBuilder();
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                if (position == 0) {   //All
+                    for (int i = 1; i < listIds.length; i++) {
+                        for (String name : listIdGroups.get(Integer.parseInt(listIds[i]))) {
+                            sb.append(name).append("\t");
+                        }
+                    }
+                } else {    //listId
+                    for (String name : listIdGroups.get(Integer.parseInt(listIds[position]))) {
+                        sb.append(name).append("\t");
+                    }
+                }
 
-        //TODO setOnItemSelectedListener
+                binding.output.setText(sb.toString());
+                sb = new StringBuilder();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
 
     }
 
