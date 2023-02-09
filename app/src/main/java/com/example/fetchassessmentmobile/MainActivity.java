@@ -23,7 +23,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             outputStrings.add(sb.toString());
-            outputStrings.set(0, new StringBuilder(outputStrings.get(0)).append("\nlistId: ").append(listIds[i])
+            outputStrings.set(0, new StringBuilder(outputStrings.get(0)).append("\n\nlistId: ").append(listIds[i])
                     .append("\n").append(sb.toString()).toString());
         }
 
