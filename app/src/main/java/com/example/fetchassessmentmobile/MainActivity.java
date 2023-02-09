@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,15 +44,18 @@ public class MainActivity extends AppCompatActivity {
 
         JSONArray jsonArray = GETJSON(SOURCEURL);
         HashMap<Integer, ArrayList<String>> listIdGroups = parseJSON(jsonArray);
+        ArrayList<String> allListIds = new ArrayList<>();
 
 
         Spinner dropdown = binding.listIdSpinner;
         StringBuilder listOptions = new StringBuilder("All");
         int i = 1;
         for (Integer key : listIdGroups.keySet()) {
-            Collections.sort(listIdGroups.get(key));    //TODO make cust comp to sort numerically
+            allListIds.addAll(listIdGroups.get(key));
+            listIdGroups.get(key).sort(new listIdComparator());
             listOptions.append(" " + Integer.toString(key));
         }
+        allListIds.sort(new listIdComparator());
         String[] listIds = listOptions.toString().split(" ");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
         dropdown.setAdapter(adapter);
@@ -61,10 +65,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 if (position == 0) {   //All
-                    for (int i = 1; i < listIds.length; i++) {
-                        for (String name : listIdGroups.get(Integer.parseInt(listIds[i]))) {
-                            sb.append(name).append("\t");
-                        }
+                    for (String name : allListIds) {
+                        sb.append(name).append("\t");
                     }
                 } else {    //listId
                     for (String name : listIdGroups.get(Integer.parseInt(listIds[position]))) {
@@ -85,6 +87,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    private class listIdComparator implements Comparator<String> {
+        @Override
+        public int compare(String s1, String s2) {
+
+            return Integer.parseInt(s1.substring(5)) - Integer.parseInt(s2.substring(5));
+        }
+    }
+
 
 
     private HashMap<Integer, ArrayList<String>> parseJSON(JSONArray JSONArrayIn) {
