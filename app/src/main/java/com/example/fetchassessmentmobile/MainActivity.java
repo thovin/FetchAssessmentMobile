@@ -78,10 +78,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //TODO make URL input type, JSONArray output?
-    class GETJSONStringTask extends AsyncTask<String, Void, String> {
+    class GETJSONStringTask extends AsyncTask<String, Void, Void> {
 
-        protected String doInBackground(String... params) {
+        @Override
+        protected Void doInBackground(String... params) {
             HttpURLConnection conn = null;
             BufferedReader reader = null;
 
@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONString = buffer.toString();
                 return null;
+
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
