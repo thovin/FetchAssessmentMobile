@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
 
         JSONArray jsonArray = GETJSON(SOURCEURL);
+        HashMap<Integer, ArrayList<String>> listIdGroups = parseJSON(jsonArray);
     }
 
 
@@ -47,27 +48,29 @@ public class MainActivity extends AppCompatActivity {
         try {
             for (int i = 0; i < JSONArrayIn.length(); i++) {
                 JSONObject curr = JSONArrayIn.getJSONObject(i);
-                int listId = (Integer) curr.get("listId");      //TODO don't shoot yourself in the foot w/ typecasting
+                if (curr.isNull("name") || curr.get("name").equals("")) { continue; }
+
+                int listId = (Integer) curr.get("listId");
                 String name = (String) curr.get("name");
 
-                if (name.equals("") || name == null) { continue; }
-
                 if (output.containsKey(listId)) {
+                    output.get(listId).add(name);
+                } else {
+                    output.put(listId, new ArrayList<String>());
                     output.get(listId).add(name);
                 }
             }
         } catch (JSONException e) {
+            e.printStackTrace();
             throw new RuntimeException(e); //TODO throw exception or return empty and let unit test deal w/?
         }
 
-        return null; //TODO
+        return output;
     }
 
     private JSONArray GETJSON(String url) {
         new GETJSONStringTask().execute(url);
-        while (JSONString == null) {
-
-        }
+        while (JSONString == null) { }
 
         try {
             return new JSONArray(JSONString);
