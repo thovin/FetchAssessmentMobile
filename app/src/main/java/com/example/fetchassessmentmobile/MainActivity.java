@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.example.fetchassessmentmobile.databinding.ActivityMainBinding;
 
@@ -21,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +25,7 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private String SOURCEURL = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
-    private String JSONString;
+    private String JSONString = null;
     private ActivityMainBinding binding;
     private ProgressDialog pd;
 
@@ -68,7 +64,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private JSONArray GETJSON(String url) {
-        new JSONTask().execute(url);
+        new GETJSONStringTask().execute(url);
+//        new JSONTaskNOTINUSE().execute(url);
+//        new JSONTask().execute();
+        while (JSONString == null) {
+
+        }
+
         try {
             return new JSONArray(JSONString);
         } catch (JSONException e) {
@@ -78,73 +80,66 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private class JSONTask extends AsyncTask<String, String, String> {
+    //TODO make URL input type, JSONArray output?
+    class GETJSONStringTask extends AsyncTask<String, Void, String> {
 
+        //TODO treash
         protected void onPreExecute() {
-            super.onPreExecute();
-
-            pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("Please wait");
-            pd.setCancelable(false);
-            pd.show();
+            int trash;
         }
 
+
         protected String doInBackground(String... params) {
-
-
-            HttpURLConnection connection = null;
+            HttpURLConnection conn = null;
             BufferedReader reader = null;
 
             try {
                 URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.connect();
 
-
-                InputStream stream = connection.getInputStream();
-
-                reader = new BufferedReader(new InputStreamReader(stream));
-
+                InputStream inStream = conn.getInputStream();
                 StringBuffer buffer = new StringBuffer();
-                String line = "";
+                if (inStream == null) { return null; }
+
+                reader = new BufferedReader(new InputStreamReader(inStream));
+                String line;
 
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + line);
+                    buffer.append(line + "\n");
+                }
 
+                if (buffer.length() == 0) {
+                    return null;
                 }
 
                 return buffer.toString();
 
-
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                return null;
             } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                try {
-                    if (reader != null) {
+                if (conn != null) { conn.disconnect(); }
+
+                if (reader != null) {
+                    try {
                         reader.close();
+                    } catch (final IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
-            return null;
         }
 
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-            JSONString = result;    //TODO does this return the JSON string or a success message?
+
+        protected void onPostExecute(String response) {
+            JSONString = response;
         }
+
+
     }
+
 
 
 
