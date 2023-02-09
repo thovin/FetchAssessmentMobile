@@ -6,6 +6,8 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.example.fetchassessmentmobile.databinding.ActivityMainBinding;
 
@@ -39,6 +41,21 @@ public class MainActivity extends AppCompatActivity {
 
         JSONArray jsonArray = GETJSON(SOURCEURL);
         HashMap<Integer, ArrayList<String>> listIdGroups = parseJSON(jsonArray);
+
+
+        Spinner dropdown = binding.listIdSpinner;
+        StringBuilder listOptions = new StringBuilder("All");
+        int i = 1;
+        for (Integer key : listIdGroups.keySet()) {//TODO will this work?
+            listOptions.append(" " + Integer.toString(key));
+        }
+        String[] listIds = listOptions.toString().split(" ");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
+        dropdown.setAdapter(adapter);
+
+
+        //TODO setOnItemSelectedListener
+
     }
 
 
@@ -133,12 +150,4 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-/*
-    //TODO put below in function (setOnItemSelectedListener?)
-    Spinner dropdown = binding.listIdSpinner;
-    String[] listIds = {"All"}; //TODO add hashmap keys
-    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, listIds);
-    dropdown.setAdapter(adapter); //TODO broken or just needs build?
-*/
 }
